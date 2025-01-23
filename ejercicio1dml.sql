@@ -54,22 +54,22 @@ INSERT INTO CURSOS
 VALUES (2, 'Administracion Linux','32432455', null, TO_DATE('11-SEP-00','DD-MON-YY'), NULL, 80);
 
 SELECT * FROM CURSOS;
-/*
+
 INSERT INTO ALUMNOS
 VALUES ('123523','Lucas','Manilva','Lopez','Alhamar, 3','V', TO_DATE('01-11-79','DD-MM-YY'),'1');
-*/
+
 INSERT INTO ALUMNOS
 VALUES ('2567567','Antonio','Lopez','Alcantara','Maniquí, 21','M',NULL,'2');
-/*
+
 INSERT INTO ALUMNOS
 VALUES ('3123689','Manuel','Alcantara','Pedrós','Julian, 2','2',null,'1');
-*//*
+
 INSERT INTO ALUMNOS
 VALUES ('4896765','Jose','Perez','Caballar',' Jarcha, 5','V',TO_DATE('03-02-77','DD-MM-YY'),'3');
-*//*
+
 INSERT INTO ALUMNOS
 VALUES ('123523','Sergio','Navas','Retal',null,'P',NULL,'1');
-*/
+
 SELECT * FROM ALUMNOS;
 
 INSERT INTO PROFESORES
