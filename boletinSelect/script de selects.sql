@@ -112,8 +112,8 @@ WHERE UPPER(NOMBRE) LIKE '%MA%';
 
 --24 Se desea promocionar los artículos de los que se posee un stock grande. Si el artículo es de más de 6000 € y el stock supera los 60000 €, se hará un descuento del 10%. Mostrar un listado de los artículos que van a entrar en la promoción, con su código de artículo, nombre del articulo, precio actual y su precio en la promoción.--
 
-SELECT  FROM ARTICULOS a 
-
+SELECT CODART,DESCRIP,PRECIO,PRECIO-(PRECIO*0.1) PRECIO_PROMOCION FROM ARTICULOS a 
+WHERE PRECIO > 6000 AND STOCK*PRECIO > 60000;
 
 
 
