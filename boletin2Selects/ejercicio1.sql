@@ -56,7 +56,7 @@ SELECT Nombre FROM asignatura WHERE Nombre LIKE '%pro%';
 SELECT Nombre FROM asignatura WHERE Curso = 1 AND Idprofesor = 'P101';
 
 -- 20
-SELECT Idalumno, Idasignatura FROM alumno_asignatura GROUP BY Idalumno, Idasignatura HAVING COUNT(*) >= 3;
+SELECT Idalumno, Idasignatura FROM alumno_asignatura ;
 
 -- 21
 SELECT Nombre, Costebasico, Costebasico * 1.1 Primera_Repeticion, Costebasico * 1.3 Segunda_Repeticion, Costebasico * 1.6 Tercera_Repeticion FROM asignatura;
