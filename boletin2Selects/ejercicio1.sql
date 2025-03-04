@@ -11,7 +11,7 @@ SELECT * FROM persona;
 SELECT Nombre, Creditos FROM asignatura WHERE Cuatrimestre = 1;
 
 -- 5
-SELECT Nombre, Apellido FROM persona WHERE Fecha_nacimiento < '1975-01-01';
+SELECT Nombre, Apellido FROM persona WHERE EXTRACT(YEAR FROM Fecha_nacimiento) < '1975';
 
 -- 6
 SELECT Nombre, Costebasico FROM asignatura WHERE Creditos > 4.5;
@@ -50,22 +50,29 @@ SELECT Nombre FROM persona WHERE Ciudad = 'Madrid' AND Varon = 0;
 SELECT Nombre, Telefono FROM persona WHERE Telefono LIKE '91%';
 
 -- 18
-SELECT Nombre FROM asignatura WHERE Nombre LIKE '%pro%';
+SELECT Nombre FROM asignatura WHERE lower(Nombre) LIKE '%pro%';
 
 -- 19
 SELECT Nombre FROM asignatura WHERE Curso = 1 AND Idprofesor = 'P101';
 
 -- 20
-SELECT DISTINCT a.Idalumno, aa.Idasignatura FROM alumno a JOIN alumno_asignatura aa ON a.Idalumno = aa.Idalumno;
+SELECT DISTINCT aa.Idalumno, aa.Idasignatura FROM ALUMNO_ASIGNATURA aa
+WHERE NUMEROMATRICULA >= 3;
 
+--Aqui se puede utilizar el decode: SELECT cod_book, decode (cod_book, 4, 'Pepito Grillo', 5, 'Peter Pan', 'Other cases') translation FROM books;
 -- 21
 SELECT Nombre, Costebasico, Costebasico * 1.1 Primera_Repeticion, Costebasico * 1.3 Segunda_Repeticion, Costebasico * 1.6 Tercera_Repeticion FROM asignatura;
 
+SELECT A.NOMBRE ,AA.NUMEROMATRICULA, DECODE (AA.NUMEROMATRICULA, 1, A.COSTEBASICO, 2, A.COSTEBASICO * 1.1, 3, A.COSTEBASICO * 1.3, A.COSTEBASICO * 1.6) COSTE_ULTIMA_MATRICULA FROM ASIGNATURA a, ALUMNO_ASIGNATURA aa
+WHERE A.IDASIGNATURA = AA.IDASIGNATURA;
+
 -- 22
-SELECT * FROM persona WHERE Fecha_nacimiento < '1970-01-01';
+SELECT * FROM persona WHERE EXTRACT(FROM Fecha_nacimiento) < '1970';
+
+SELECT * FROM PERSONA p WHERE FECHA_NACIMIENTO < TO_DATE('1970','YYYY');
 
 -- 23
-SELECT DISTINCT Dni FROM profesor;
+SELECT DISTINCT DNI FROM profesor;
 
 -- 24
 SELECT Idalumno FROM alumno_asignatura WHERE Idasignatura = '130122';
@@ -77,10 +84,27 @@ SELECT DISTINCT Idasignatura FROM alumno_asignatura;
 SELECT Nombre FROM asignatura WHERE Creditos > 4 AND (Cuatrimestre = 1 OR Curso = 1);
 
 -- 27
-SELECT DISTINCT Idtitulacion FROM asignatura WHERE Idtitulacion IS NOT NULL;
+SELECT DISTINCT a.Idtitulacion FROM asignatura a
+JOIN TITULACION t ON T.IDTITULACION = a.IDTITULACION;
 
 -- 28
 SELECT Dni FROM persona WHERE Apellido LIKE '%g%' OR Apellido LIKE '%G%';
 
 -- 29
-SELECT * FROM persona WHERE Varon = 1 AND Fecha_nacimiento > '1970-01-01' AND Ciudad LIKE 'M%';
+SELECT * FROM persona WHERE Varon = 1 AND Fecha_nacimiento > TO_DATE('1970-01-01', 'YYYY-MM-DD') AND Ciudad LIKE 'M%';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
