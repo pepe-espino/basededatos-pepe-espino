@@ -71,8 +71,20 @@ END;
 --siguiente:
 --AZAR (minimo NUMBER, maximo NUMBER) RETURN NUMBER
 
+CREATE OR REPLACE FUNCTION AZAR(minimo NUMBER, maximo NUMBER) 
+RETURN NUMBER 
+IS
+    resultado NUMBER;
+BEGIN
+    resultado := ROUND(DBMS_RANDOM.VALUE(minimo, maximo));
+
+    RETURN resultado;
+END AZAR;
 
 
+SELECT AZAR(1, 100) FROM DUAL;
+SELECT AZAR(5, 45) FROM DUAL;
+SELECT AZAR(2, 200) FROM DUAL;
 
 
 -----------------------------------------------------------------------------------
