@@ -275,10 +275,39 @@ END;
 
 
 ------------------------------------------------------------------------------------------
---------------------FUNCIONES-----------------------------------------------------
+--------------------REGISTROS-------------------------------------------------------------
 
 
+DECLARE
+  TYPE RegPersona IS RECORD
+  (
+    CODIGO NUMBER(2),
+    NOMBRE VARCHAR2(40),
+    EDAD   NUMBER
+  );
+  Pepe RegPersona;
+BEGIN
+  Pepe.CODIGO := 1;
+  Pepe.NOMBRE := 'Pepe';
+  Pepe.EDAD   := 30;
+  DBMS_OUTPUT.PUT_LINE ('Código: ' || Pepe.CODIGO);
+  DBMS_OUTPUT.PUT_LINE ('Nombre: ' || Pepe.NOMBRE);
+  DBMS_OUTPUT.PUT_LINE ('Edad  : ' || Pepe.EDAD);
+  INSERT INTO PERSONASPRUEBA VALUES Pepe;
+END;
 
+
+DECLARE
+  Pepe PERSONASPRUEBA%rowtype;
+BEGIN
+  Pepe.CODIGO := 1;
+  Pepe.NOMBRE := 'Pepe';
+Pepe.EDAD   := 30;
+  DBMS_OUTPUT.PUT_LINE ('Código: ' || Pepe.CODIGO);
+  DBMS_OUTPUT.PUT_LINE ('Nombre: ' || Pepe.NOMBRE);
+  DBMS_OUTPUT.PUT_LINE ('Edad  : ' || Pepe.EDAD);
+  INSERT INTO PERSONASPRUEBA VALUES Pepe;
+END;
 
 
 

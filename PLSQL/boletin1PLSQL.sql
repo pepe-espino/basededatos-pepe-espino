@@ -64,6 +64,7 @@ BEGIN
 	SERIE(0,35,5);  -- de 5 en 5
 END;
 
+
 ------------------------------------------------------------------------------
 
 --4. Crea una función AZAR que reciba dos parámetros y genere un número al
@@ -71,20 +72,19 @@ END;
 --siguiente:
 --AZAR (minimo NUMBER, maximo NUMBER) RETURN NUMBER
 
-CREATE OR REPLACE FUNCTION AZAR(minimo NUMBER, maximo NUMBER) 
-RETURN NUMBER 
+CREATE OR REPLACE FUNCTION AZAR(MINIMO NUMBER, MAXIMO NUMBER) RETURN NUMBER 
 IS
-    resultado NUMBER;
+    RESULTADO NUMBER;
 BEGIN
-    resultado := ROUND(DBMS_RANDOM.VALUE(minimo, maximo));
+    RESULTADO := ROUND(DBMS_RANDOM.VALUE(MINIMO, MAXIMO));
 
-    RETURN resultado;
+    RETURN RESULTADO;
 END AZAR;
 
 
-SELECT AZAR(1, 100) FROM DUAL;
-SELECT AZAR(5, 45) FROM DUAL;
-SELECT AZAR(2, 200) FROM DUAL;
+SELECT AZAR(1, 100) AS NUMERO_AZAR_0_100 FROM DUAL;
+SELECT AZAR(5, 45) AS NUMERO_AZAR_5_45 FROM DUAL;
+SELECT AZAR(2, 200) AS NUMERO_AZAR_0_200 FROM DUAL;
 
 
 -----------------------------------------------------------------------------------
