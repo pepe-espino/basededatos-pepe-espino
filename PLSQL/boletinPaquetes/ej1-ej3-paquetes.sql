@@ -3,7 +3,6 @@
 --para comprobar que las llamadas a funciones y procedimiento funcionan
 --correctamente.
 
-
 CREATE OR REPLACE
 PACKAGE aritmetica IS
   version NUMBER := 1.0;
@@ -56,7 +55,6 @@ SELECT ARITMETICA.SUMA(4,3) FROM DUAL;
 SELECT ARITMETICA.RESTA(4,3) FROM DUAL;
 SELECT ARITMETICA.MULTIPLICA(4,3) FROM DUAL;
 SELECT ARITMETICA.DIVIDE(4,3) FROM DUAL;
-
 
 
 --5.6.2. Al paquete anterior añade una función llamada RESTO que reciba dos

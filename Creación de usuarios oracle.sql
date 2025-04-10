@@ -1,3 +1,3 @@
 ALTER SESSION SET "_oracle_script"=TRUE;
-CREATE USER boletinTriggers IDENTIFIED BY boletinTriggers;
-GRANT CONNECT, RESOURCE, DBA TO boletinTriggers;
+CREATE USER ejSorpresa-JAED IDENTIFIED BY ejSorpresa-JAED;
+GRANT CONNECT, RESOURCE, DBA TO ejSorpresa-JAED;
