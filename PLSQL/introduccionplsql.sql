@@ -310,10 +310,33 @@ Pepe.EDAD   := 30;
 END;
 
 
+------------------------------------------------------------------------------
+------------------TRIGGERS DE VISTAS -----------------------------------------
 
 
+CREATE VIEW existenciasCompleta (tipo,modelo,precio,almacen,cantidad)
+AS
+SELECT p.tipo, p.modelo, p.precio_venta,e.n_almacen, e.cantidad
+FROM PIEZAS p JOIN EXISTENCIAS e ON p.tipo=e.tipo AND p.modelo=e.modelo
+ORDER BY p.tipo,p.modelo,e.n_almacen;
 
+--tras crear la vista de intenta insertar datos
 
+INSERT INTO existenciasCompleta VALUES('ZA',3,4,3,200); --No puedes hacer insert porque son dos tablas y NO sabe donde meter los datos
+  
+--creamos un trigger para poder insertar
+
+CREATE OR REPLACE
+TRIGGER ins_piezas_exis
+INSTEAD OF INSERT ON existenciascompleta
+
+BEGIN
+  INSERT INTO piezas(tipo,modelo,precio_venta)
+  VALUES(:NEW.tipo,:NEW.modelo,:NEW.precio);
+
+  INSERT INTO existencias(tipo,modelo,n_almacen,cantidad)
+  VALUES(:NEW.tipo,:NEW.modelo, :NEW.almacen,:NEW.cantidad);
+END;
 
 
 
