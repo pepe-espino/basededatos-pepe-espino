@@ -1,0 +1,162 @@
+---------------------------------------------------------------------
+---------------------- EJERCICIO 1 ----------------------------------
+
+CREATE OR REPLACE PROCEDURE INSERTAR_APUESTA (P_CODIGO_CABALLO VARCHAR2, P_CODIGO_CARRERA VARCHAR2, P_DNI_CLIENTE VARCHAR2, P_IMPORTE NUMBER)
+IS 
+
+	V_EXISTE_CABALLO NUMBER;
+	V_EXISTE_CARRERA NUMBER;
+	V_EXISTE_CLIENTE NUMBER;
+
+	V_CABALLO_EN_CARRERA NUMBER;
+
+	V_LIMITE_CARRERA NUMBER;
+
+BEGIN
+
+	SELECT COUNT(*) INTO V_EXISTE_CABALLO 
+	FROM CABALLOS c 
+	WHERE C.CODCABALLO = P_CODIGO_CABALLO;
+	
+	SELECT COUNT(*) INTO V_EXISTE_CARRERA 
+	FROM CARRERAS c 
+	WHERE C.CODCARRERA = P_CODIGO_CARRERA;
+
+	SELECT COUNT(*) INTO V_EXISTE_CLIENTE 
+	FROM CLIENTES c 
+	WHERE C.DNI = P_DNI_CLIENTE;
+	
+	IF V_EXISTE_CABALLO = 0 THEN
+		RAISE_APPLICATION_ERROR(-20001, 'Caballo imaginario');
+	END IF;
+	
+	IF V_EXISTE_CARRERA = 0 THEN
+		RAISE_APPLICATION_ERROR(-20002, 'Carrera imaginaria');
+	END IF;
+
+	IF V_EXISTE_CLIENTE = 0 THEN
+		RAISE_APPLICATION_ERROR(-20003, 'Cliente imaginario');
+	END IF;
+
+
+	IF V_EXISTE_CABALLO != 0 AND V_EXISTE_CARRERA != 0 THEN
+		
+		SELECT COUNT(*) INTO V_CABALLO_EN_CARRERA
+		FROM PARTICIPACIONES p WHERE P.CODCARRERA = P_CODIGO_CARRERA AND P.CODCABALLO = P_CODIGO_CABALLO;
+	
+		IF V_CABALLO_EN_CARRERA = 0 THEN
+			RAISE_APPLICATION_ERROR(-20004, 'Caballo existente pero descansando');
+		END IF;
+	
+	END IF;
+
+	SELECT C.APUESTALIMITE INTO V_LIMITE_CARRERA 
+	FROM CARRERAS c 
+	WHERE C.CODCARRERA = P_CODIGO_CARRERA;
+
+	IF V_LIMITE_CARRERA < P_IMPORTE THEN
+		RAISE_APPLICATION_ERROR(-20005, 'Jugar es malo');
+	END IF;
+
+	INSERT INTO APUESTAS a (CODCABALLO, CODCARRERA, DNICLIENTE, IMPORTE, TANTOPORUNO) VALUES(P_CODIGO_CABALLO, P_CODIGO_CARRERA, P_DNI_CLIENTE, P_IMPORTE, 2);
+	
+END;
+
+
+--CASOS DE PRUEBA--
+
+--EL DNI NO EXISTE, DEBE SALTAR EXCEPCION DE CLIENTE IMAGINARIO--
+BEGIN
+	INSERTAR_APUESTA ('2', 'C5', '2222222B' ,100);
+END;
+
+---------------------------------------------------------------------------------------------------
+
+
+--EL CODIGO DE CABALLO NO EXISTE, DEBE SALTAR EXCEPCION DE CABALLO IMAGINARIO--
+
+BEGIN
+	INSERTAR_APUESTA ('200', 'C5', '111A' ,100);
+END;
+
+---------------------------------------------------------------------------------------------------
+
+
+--EL CODIGO DE CARRERA NO EXISTE, DEBE SALTAR EXCEPCION DE CARRERA IMAGINARIA--
+
+BEGIN
+	INSERTAR_APUESTA ('2', 'C200', '111A' ,100);
+END;
+
+
+---------------------------------------------------------------------------------------------------
+
+
+-- TANTO EL CABALLO COMO LA CARRERA EXISTEN , PERO EL CABALLO NO ESTA EN LA CARRERA, SINO QUE ESTA DESCANSANDO
+-- POR TANTO 
+
+BEGIN
+	INSERTAR_APUESTA ('2', 'C3', '111A' ,100);
+END;
+
+---------------------------------------------------------------------------------------------------
+
+--EL IMPORTE SUPERA EL LIMITE DE APUESTAS, DEBE SALTAR EXCEPCION DE JUGAR ES MALO--
+
+BEGIN
+	INSERTAR_APUESTA ('2', 'C5', '111A' ,10000);
+END;
+
+
+---------------------------------------------------------------------------------------------------
+
+--EJECUTA PERFECTAMENTE, YA QUE AMBOS EXISTEN Y EL CABALLO PARTICIPA EN ESA CARRERA Y EL IMPORTE NO ES SUPERIOR AL LIMITE.
+
+BEGIN
+	INSERTAR_APUESTA ('4','C2', '111A',100);
+END;
+
+SELECT * FROM APUESTAS a ;
+SELECT * FROM PARTICIPACIONES p ;
+
+
+----------------------------------------------------------------------
+------------------------ EJERCICIO 2 ---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

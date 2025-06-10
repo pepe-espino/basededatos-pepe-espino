@@ -1,3 +1,3 @@
 alter session set "_oracle_script"=true;  
-create user PEDIDOS_ESPINOJOSEANTONIO identified by PEDIDOS_ESPINOJOSEANTONIO;
-GRANT CONNECT, RESOURCE, DBA TO PEDIDOS_ESPINOJOSEANTONIO;
+create user caballos_recuperacion identified by caballos_recuperacion;
+GRANT CONNECT, RESOURCE, DBA TO caballos_recuperacion;
