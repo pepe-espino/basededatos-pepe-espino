@@ -1,0 +1,330 @@
+alter session set "_oracle_script"=true;  
+create user boletin1_recuperacion_jaed identified by boletin1_recuperacion_jaed;
+GRANT CONNECT, RESOURCE, DBA TO boletin1_recuperacion_jaed;
+
+
+---------------------------------------------------------------
+--------------- CREACION DE TABLAS ----------------------------
+
+
+CREATE TABLE TIPO_PIEZA
+(
+	TIPO VARCHAR2(2),
+	DESCRIPCION VARCHAR2(25),
+	CONSTRAINT PK_TIPO_PIEZA PRIMARY KEY(TIPO)
+);
+
+CREATE TABLE PIEZA
+(
+	MODELO NUMBER(2),
+	TIPO VARCHAR2(2),
+	PRECIO_VENTA NUMBER(11,4),
+	CONSTRAINT PK_PIEZA PRIMARY KEY(MODELO, TIPO),
+	CONSTRAINT FK_PIEZA FOREIGN KEY(TIPO) REFERENCES TIPO_PIEZA(TIPO)
+);
+
+CREATE TABLE EMPRESA
+(
+	CIF VARCHAR2(9),
+	NOMBRE VARCHAR2(50),
+	TELEFONO NUMBER(11,4),
+	DIRECCION VARCHAR2(50),
+	LOCALIDAD VARCHAR2(50),
+	PROVINCIA VARCHAR2(50),
+	CONSTRAINT PK_EMPRESA PRIMARY KEY(CIF)
+);
+
+CREATE TABLE SUMINISTRO
+(
+	CIF VARCHAR(9),
+	MODELO NUMBER(2),
+	TIPO VARCHAR2(2),
+	PRECIO_COMPRA NUMBER(11,4),
+	CONSTRAINT PK_SUMINISTRO PRIMARY KEY(CIF, MODELO, TIPO),
+	CONSTRAINT FK1_SUMINISTRO FOREIGN KEY(CIF) REFERENCES EMPRESA(CIF),
+	CONSTRAINT FK2_SUMINISTRO FOREIGN KEY(MODELO, TIPO) REFERENCES PIEZA(MODELO, TIPO)
+);
+
+CREATE TABLE ALMACEN
+(
+	N_ALMACEN NUMBER(2),
+	DESCRIPCION VARCHAR2(1000),
+	DIRECCION VARCHAR2(100),
+	CONSTRAINT PK_ALMACEN PRIMARY KEY(N_ALMACEN)
+);
+
+CREATE TABLE EXISTENCIA
+(
+	MODELO NUMBER(2),
+	TIPO VARCHAR2(2),
+	N_ALMACEN NUMBER(2),
+	CANTIDAD NUMBER(9),
+	CONSTRAINT PK_EXISTENCIA PRIMARY KEY(MODELO, TIPO, N_ALMACEN),
+	CONSTRAINT FK1_EXISTENCIA FOREIGN KEY(MODELO, TIPO) REFERENCES PIEZA(MODELO, TIPO),
+	CONSTRAINT FK2_EXISTENCIA FOREIGN KEY(N_ALMACEN) REFERENCES ALMACEN(N_ALMACEN)
+);
+
+CREATE TABLE DEPARTAMENTO
+(
+	NUM_DEP NUMBER(3),
+	NOMBRE VARCHAR2(50),
+	CONSTRAINT PK_DEP PRIMARY KEY(NUM_DEP)
+);
+
+CREATE TABLE EMPLEADO 
+(
+	EMPNO NUMBER(3),
+	APELLIDO VARCHAR2(50),
+	SALARIO NUMBER(6,2),
+	OFICIO VARCHAR2(50),
+	FECHA_ALTA DATE,
+	N_ALMACEN NUMBER(2),
+	NUM_DEP NUMBER(3),
+	CONSTRAINT PK_EMP PRIMARY KEY(EMPNO),
+	CONSTRAINT FK1_EMP FOREIGN KEY(N_ALMACEN) REFERENCES ALMACEN(N_ALMACEN),
+	CONSTRAINT FK2_EMP FOREIGN KEY(NUM_DEP) REFERENCES DEPARTAMENTO(NUM_DEP)
+);
+
+
+----------------------------------------------------------------
+----------------------- INSERTS --------------------------------
+
+DELETE FROM PIEZA p;
+DELETE FROM TIPO_PIEZA tp ;
+DELETE FROM EMPLEADO e ;
+DELETE FROM EMPRESA e ;
+DELETE FROM ALMACEN a ;
+DELETE FROM SUMINISTRO ;
+DELETE FROM EXISTENCIA e ;
+DELETE FROM DEPARTAMENTO d ;
+
+
+INSERT INTO TIPO_PIEZA VALUES ('MO', 'Motor');
+INSERT INTO TIPO_PIEZA VALUES ('RU', 'Rueda');
+INSERT INTO TIPO_PIEZA VALUES ('FR', 'Freno');
+
+INSERT INTO PIEZA VALUES (10, 'MO', 1200.50);
+INSERT INTO PIEZA VALUES (20, 'RU', 150.00);
+INSERT INTO PIEZA VALUES (30, 'FR', 85.75);
+
+INSERT INTO EMPRESA VALUES ('A12345678', 'MotoRecambios S.A.', 9541234, 'Calle Moto 1', 'Sevilla', 'Sevilla');
+INSERT INTO EMPRESA VALUES ('B87654321', 'Ruedas y Más S.L.', 9116543, 'Av. Neumáticos 22', 'Madrid', 'Madrid');
+
+INSERT INTO SUMINISTRO VALUES ('A12345678', 10, 'MO', 1000.00);
+INSERT INTO SUMINISTRO VALUES ('B87654321', 20, 'RU', 120.00);
+INSERT INTO SUMINISTRO VALUES ('A12345678', 30, 'FR', 60.00);
+
+INSERT INTO ALMACEN VALUES (1, 'Almacén central', 'Polígono Industrial 12, Sevilla');
+INSERT INTO ALMACEN VALUES (2, 'Almacén secundario', 'Calle Logística 45, Madrid');
+
+INSERT INTO EXISTENCIA VALUES (10, 'MO', 1, 50);
+INSERT INTO EXISTENCIA VALUES (20, 'RU', 1, 100);
+INSERT INTO EXISTENCIA VALUES (30, 'FR', 2, 75);
+
+INSERT INTO DEPARTAMENTO VALUES (20, 'Logística');
+INSERT INTO DEPARTAMENTO VALUES (40, 'Mantenimiento');
+
+INSERT INTO EMPLEADO VALUES (127, 'García', 1800.50, 'Mecánico', TO_DATE('2022-04-15', 'YYYY-MM-DD'), 1, 20);
+INSERT INTO EMPLEADO VALUES (128, 'López', 1950.00, 'Encargado', TO_DATE('2021-09-01', 'YYYY-MM-DD'), 1, 20);
+INSERT INTO EMPLEADO VALUES (129, 'Pérez', 1700.00, 'Repartidor', TO_DATE('2023-01-10', 'YYYY-MM-DD'), 2, 40);
+INSERT INTO EMPLEADO VALUES (130, 'Morales', 1150.00, 'Repartidor', TO_DATE('2025-05-12', 'YYYY-MM-DD'), 2, 40);
+
+
+----------------------------------------------------------------
+----------------------- EJERCICIO 1 ----------------------------
+
+/*
+ 
+ 1.Realiza los siguientes cursores (implícitos o explícitos)
+a) Realiza un bloque de programa en PL-SQL que visualice el apellido y el oficio del
+empleado decódigo 127.
+b) Crea un bloque de programa que visualice los apellidos de los empleados
+pertenecientes al departamento 20.
+ 
+*/
+
+
+-- a)
+
+
+DECLARE
+
+V_APELLIDO VARCHAR2(50);
+V_OFICIO VARCHAR2(50);
+
+BEGIN
+	
+	SELECT E.APELLIDO, E.OFICIO INTO V_APELLIDO , V_OFICIO
+	FROM EMPLEADO e WHERE E.EMPNO = 127;
+
+	DBMS_OUTPUT.PUT_LINE('EL EMPLEADO CON CÓDIGO 127 SE APELLIDA '|| V_APELLIDO || ' Y ES ' || V_OFICIO);
+	
+END;
+
+
+-- b)
+
+DECLARE
+
+	CURSOR C_EMPLEADOS IS
+	SELECT * FROM EMPLEADO e 
+	WHERE E.NUM_DEP = 20;
+
+BEGIN
+	
+	FOR E IN C_EMPLEADOS LOOP 
+		DBMS_OUTPUT.PUT_LINE(E.APELLIDO|| ' TRABAJA EN EL DEPARTAMENTO 20.');
+	END LOOP;
+	
+END;
+
+
+/*
+ 
+2. Usando un cursor escribe un bloque PL/SQL que visualice el apellido y la fecha de alta de
+todos los empleados ordenados por fecha de alta
+ 
+*/
+
+
+DECLARE
+
+	CURSOR C_EMP_ALTA IS
+	SELECT * FROM EMPLEADO e
+	ORDER BY E.FECHA_ALTA;
+
+BEGIN
+	
+	FOR E IN C_EMP_ALTA LOOP
+		DBMS_OUTPUT.PUT_LINE('EL EMPLEADO '|| UPPER(E.APELLIDO) || ' SE DIO DE ALTA EL '|| E.FECHA_ALTA);
+	END LOOP;
+	
+END;
+
+
+/*
+ 
+3. Crea un trigger que impida que se agregue o modifique un empleado con el sueldo mayor o
+menor que los valores máximo y mínimo respectivamente para su cargo. Se agrega la
+restricción de que el trigger no se disparará si el oficio es PRESIDENTE.
+ 
+*/
+
+
+CREATE OR REPLACE TRIGGER T_EMPSUELDO 
+BEFORE INSERT ON EMPLEADO
+FOR EACH ROW
+DECLARE 
+	V_SALARIOMIN NUMBER(6,2);
+	V_SALARIOMAX NUMBER(6,2);
+BEGIN 
+	
+	SELECT MAX(EM.SALARIO), MIN(EM.SALARIO) 
+	INTO V_SALARIOMAX, V_SALARIOMIN
+	FROM EMPLEADO em
+	WHERE EM.OFICIO = :NEW.OFICIO;	
+
+	IF (:NEW.SALARIO < V_SALARIOMIN OR :NEW.SALARIO > V_SALARIOMAX) AND :NEW.OFICIO != 'PRESIDENTE' THEN
+		
+		RAISE_APPLICATION_ERROR(-20001, 'EL SALARIO NO PUEDE SUPERAR EL VALOR MÁXIMO NI EL VALOR MÍNIMO.');
+	
+	END IF;
+	
+END;
+
+
+------------------------------------------------------------
+------------------ PRUEBAS ---------------------------------
+
+--MAXIMOS Y MINIMOS
+
+SELECT MAX(E.SALARIO), MIN(E.SALARIO) 
+FROM EMPLEADO e
+WHERE UPPER(E.OFICIO) = 'REPARTIDOR'; 
+
+SELECT *
+FROM EMPLEADO e
+WHERE UPPER(E.OFICIO) = 'REPARTIDOR'; 
+
+-- UNA VEZ COMPROBAMOS LOS VALORES MÁXIMOS Y MÍNIMOS QUEDA ESTABLECIDO QUE 
+-- PARA REPARTIDOR EL MAX ES 1700 Y MIN 1150
+
+--CASO VALIDO
+INSERT INTO EMPLEADO VALUES (131, 'Flores', 1300.00, 'Repartidor', TO_DATE('2025-05-12', 'YYYY-MM-DD'), 2, 40);
+
+--CASO ERRÓNEO LIMITE SUPERIOR, SALTA ERROR
+INSERT INTO EMPLEADO VALUES (132, 'Espino', 9000.00, 'Repartidor', TO_DATE('2025-05-12', 'YYYY-MM-DD'), 2, 40);
+
+--CASO ERRÓNEO LIMITE INFERIOR, SALTA ERROR
+INSERT INTO EMPLEADO VALUES (133, 'Cabeza', 1000.00, 'Repartidor', TO_DATE('2025-05-12', 'YYYY-MM-DD'), 2, 40);
+
+	
+/*
+ 
+4. Crea triggers que permitan actualizar en cascada el campo tipo de la tabla tipos_pieza en
+caso de que sea modificado con una instrucción UPDATE.
+Propaga esa actualización por las tablas piezas, existencias y suministros (harán falta
+varios triggers).
+ 
+*/
+
+
+CREATE OR REPLACE TRIGGER T_ACTUALIZAR_TIPO
+BEFORE UPDATE OF TIPO ON TIPO_PIEZA
+FOR EACH ROW
+BEGIN
+	
+	
+	
+END;
+
+
+/*
+
+5. Crea una tabla llamada suministros_audit con los campos tipo de pieza, modelo de pieza, cif,
+precio viejo, precio nuevo y fecha (todos con los mismos tipos de datos que los equivalentes en
+la tabla suministros).
+Consigue que cada vez que se modifica un precio en la tabla suministros se almacene un
+registros en la tabla suministros_audit con el precio viejo, el nuevo y la fecha del cambio.
+
+*/
+
+CREATE TABLE SUMINISTRO_AUDIT
+(
+	CIF VARCHAR(9),
+	MODELO NUMBER(2),
+	TIPO VARCHAR2(2),
+	PRECIO_COMPRA_ANTIGUO NUMBER(11,4),
+	PRECIO_COMPRA_NUEVO NUMBER(11,4),
+	FECHA_CAMBIO DATE,
+	CONSTRAINT PK_SUMINISTRO_AUDIT PRIMARY KEY(CIF, MODELO, TIPO)
+);
+
+
+CREATE OR REPLACE TRIGGER T_SUMIN_AUDIT
+AFTER UPDATE OF PRECIO_COMPRA ON SUMINISTRO
+FOR EACH ROW 
+BEGIN 
+	
+	INSERT INTO SUMINISTRO_AUDIT sa (CIF ,MODELO,TIPO,PRECIO_COMPRA_ANTIGUO,PRECIO_COMPRA_NUEVO ,FECHA_CAMBIO)
+	VALUES (:OLD.CIF, :OLD.MODELO, :OLD.TIPO, :OLD.PRECIO_COMPRA, :NEW.PRECIO_COMPRA, SYSDATE);
+	
+END;
+
+------------------------------------------------------------
+------------------ PRUEBAS ---------------------------------
+
+SELECT * FROM SUMINISTRO s ;
+
+SELECT * FROM SUMINISTRO_AUDIT sa ;
+
+UPDATE SUMINISTRO SET PRECIO_COMPRA = 2000
+WHERE CIF = 'A12345678' AND MODELO = 10 AND TIPO = 'MO';
+
+
+
+
+
+
+
+
