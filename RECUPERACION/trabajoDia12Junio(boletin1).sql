@@ -1,6 +1,6 @@
-alter session set "_oracle_script"=true;  
-create user boletin1_recuperacion_jaed identified by boletin1_recuperacion_jaed;
-GRANT CONNECT, RESOURCE, DBA TO boletin1_recuperacion_jaed;
+--alter session set "_oracle_script"=true;  
+--create user boletin1_recuperacion_jaed identified by boletin1_recuperacion_jaed;
+--GRANT CONNECT, RESOURCE, DBA TO boletin1_recuperacion_jaed;
 
 
 ---------------------------------------------------------------
@@ -132,6 +132,7 @@ INSERT INTO EMPLEADO VALUES (130, 'Morales', 1150.00, 'Repartidor', TO_DATE('202
 
 ----------------------------------------------------------------
 ----------------------- EJERCICIO 1 ----------------------------
+----------------------------------------------------------------
 
 /*
  
@@ -178,6 +179,10 @@ BEGIN
 	
 END;
 
+----------------------------------------------------------------
+----------------------- EJERCICIO 2 ----------------------------
+----------------------------------------------------------------
+
 
 /*
  
@@ -200,6 +205,11 @@ BEGIN
 	END LOOP;
 	
 END;
+
+
+----------------------------------------------------------------
+----------------------- EJERCICIO 3 ----------------------------
+----------------------------------------------------------------
 
 
 /*
@@ -258,6 +268,12 @@ INSERT INTO EMPLEADO VALUES (132, 'Espino', 9000.00, 'Repartidor', TO_DATE('2025
 --CASO ERRÓNEO LIMITE INFERIOR, SALTA ERROR
 INSERT INTO EMPLEADO VALUES (133, 'Cabeza', 1000.00, 'Repartidor', TO_DATE('2025-05-12', 'YYYY-MM-DD'), 2, 40);
 
+
+
+----------------------------------------------------------------
+----------------------- EJERCICIO 4 ----------------------------
+----------------------------------------------------------------
+
 	
 /*
  
@@ -269,14 +285,63 @@ varios triggers).
 */
 
 
-CREATE OR REPLACE TRIGGER T_ACTUALIZAR_TIPO
-BEFORE UPDATE OF TIPO ON TIPO_PIEZA
+CREATE OR REPLACE TRIGGER T_UPDATE_TIPO
+AFTER UPDATE OF TIPO ON TIPO_PIEZA
 FOR EACH ROW
 BEGIN
 	
-	
-	
+    UPDATE PIEZA
+    SET TIPO = :NEW.TIPO
+    WHERE TIPO = :OLD.TIPO;
+
+    UPDATE EXISTENCIA
+    SET TIPO = :NEW.TIPO
+    WHERE TIPO = :OLD.TIPO;
+
+    UPDATE SUMINISTRO
+    SET TIPO = :NEW.TIPO
+    WHERE TIPO = :OLD.TIPO;
+
+    
 END;
+
+------------------------------------------------------------
+------------------ PRUEBAS ---------------------------------
+
+-- PRIMERO DEBEMOS ELIMINAR TEMPORALMENTE LAS CONSTRAINTS YA QUE NO SE PUEDEN MODIFICAR LAS PK QUE SON FK EN OTRA TABLA
+
+ALTER TABLE PIEZA DROP CONSTRAINT FK_PIEZA;
+ALTER TABLE SUMINISTRO DROP CONSTRAINT FK2_SUMINISTRO;
+ALTER TABLE EXISTENCIA DROP CONSTRAINT FK1_EXISTENCIA;
+
+-- A CONTINUACION EJECUTAMOS EL UPDATE PARA VER SI FUNCIONA EL TRIGGER
+
+UPDATE TIPO_PIEZA
+SET TIPO = 'MT'
+WHERE TIPO = 'MO';
+
+-- VOLVEMOS A CREAR LAS CONSTRAINTS PARA UNIR LAS TABLAS
+	    
+ALTER TABLE PIEZA
+ADD CONSTRAINT FK_PIEZA FOREIGN KEY (TIPO) REFERENCES TIPO_PIEZA(TIPO);
+
+ALTER TABLE SUMINISTRO
+ADD CONSTRAINT FK2_SUMINISTRO FOREIGN KEY (MODELO, TIPO) REFERENCES PIEZA(MODELO, TIPO);
+	
+ALTER TABLE EXISTENCIA
+ADD CONSTRAINT FK1_EXISTENCIA FOREIGN KEY (MODELO, TIPO) REFERENCES PIEZA(MODELO, TIPO);
+
+-- COMPROBAMOS QUE SE HAN ACTUALIZADO TODOS LOS DATOS
+
+SELECT TIPO FROM PIEZA p ;
+SELECT TIPO FROM SUMINISTRO s ;
+SELECT TIPO FROM EXISTENCIA e ;
+
+
+
+----------------------------------------------------------------
+----------------------- EJERCICIO 5 ----------------------------
+----------------------------------------------------------------
 
 
 /*
@@ -318,8 +383,93 @@ SELECT * FROM SUMINISTRO s ;
 
 SELECT * FROM SUMINISTRO_AUDIT sa ;
 
-UPDATE SUMINISTRO SET PRECIO_COMPRA = 2000
-WHERE CIF = 'A12345678' AND MODELO = 10 AND TIPO = 'MO';
+--COMPROBAMOS PRIMERO LAS TABLAS, Y EJECUTAMOS EL UPDATE
+
+UPDATE SUMINISTRO s SET PRECIO_COMPRA = 2000
+WHERE s.MODELO = 10 AND S.CIF = 'A12345678' AND S.TIPO = 'MT';
+
+-- UNA VEZ ACTUALIZADO COMPROBAMOS SI SE HAN INSERTADO LOS CAMBIOS
+
+SELECT * FROM SUMINISTRO_AUDIT sa ;
+
+
+
+----------------------------------------------------------------
+----------------------- EJERCICIO 6 ----------------------------
+----------------------------------------------------------------
+
+
+/*
+
+6. Crear un trigger para la tabla de piezas que prohíba modificar el precio de venta de una pieza
+a un precio más pequeño que el del menor precio de compra para esa pieza (debe provocar un
+error si se produce esa situación, la modificación del precio no se realizará)
+
+*/
+
+
+CREATE OR REPLACE TRIGGER T_PRECIO_PIEZA
+BEFORE UPDATE OF PRECIO_VENTA ON PIEZA
+FOR EACH ROW
+DECLARE
+	V_PRECIOMIN NUMBER(11,4);
+	V_PRECIOMAX NUMBER(11,4);
+BEGIN
+	
+	SELECT MAX(P.PRECIO_VENTA), MIN(P.PRECIO_VENTA)
+	INTO V_PRECIOMAX, V_PRECIOMIN
+	FROM PIEZA p 
+	WHERE P.MODELO = :NEW.MODELO AND p.TIPO = :NEW.TIPO;
+	
+	IF :NEW.PRECIO_VENTA > V_PRECIOMAX OR :NEW.PRECIO_VENTA < V_PRECIOMIN THEN
+		RAISE_APPLICATION_ERROR(-20002, 'EL PRECIO DE VENTA NO PUEDE SER MAYOR NI MENOR A LOS LIMITES ESTABLECIDOS');
+	END IF;
+	
+	
+END;
+
+------------------------------------------------------------
+------------------ PRUEBAS ---------------------------------
+
+SELECT * FROM PIEZA;
+
+--HACEMOS EL INSERT DENTRO DE LOS LÍMITES PARA LUEGO MODIFICARLO
+INSERT INTO PIEZA VALUES(40, 'RU', 500);
+
+--EJECUTAMOS EL UPDATE
+
+UPDATE PIEZA p SET PRECIO_venta = 1300
+WHERE p.MODELO = 40 AND p.TIPO = 'RU';
+
+--UNA VEZ ACTUALIZADO VEMOS QUE SI NO HA SALTADO LA EXCEPCION EL PRECIO ESTÁ ACTUALIZADO
+
+SELECT * FROM PIEZA;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
