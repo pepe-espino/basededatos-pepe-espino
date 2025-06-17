@@ -1,3 +1,3 @@
 alter session set "_oracle_script"=true;  
-create user repasoGPT identified by repasoGPT;
-GRANT CONNECT, RESOURCE, DBA TO repasoGPT;
+create user examenGPTAVANZADO identified by examenGPTAVANZADO;
+GRANT CONNECT, RESOURCE, DBA TO examenGPTAVANZADO;
