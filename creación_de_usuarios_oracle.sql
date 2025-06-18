@@ -1,3 +1,3 @@
-alter session set "_oracle_script"=true;  
-create user examenGPTAVANZADO identified by examenGPTAVANZADO;
-GRANT CONNECT, RESOURCE, DBA TO examenGPTAVANZADO;
+--alter session set "_oracle_script"=true;  
+--create user recuperacionPLSQL_JAED identified by recuperacionPLSQL_JAED;
+--GRANT CONNECT, RESOURCE, DBA TO recuperacionPLSQL_JAED;
